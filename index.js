@@ -9,6 +9,7 @@ server.use(express.json());
 
 const db = require("./data/db.js");
 
+// GET REQUEST
 server.get("/api/users", (req, res) => {
   db.find()
     .then(users => {
@@ -19,6 +20,27 @@ server.get("/api/users", (req, res) => {
         .status(500)
         .json({ error: "The users information could not be retrieved" });
     });
+});
+
+// POST REQUEST
+server.post("/api/users", (req, res) => {
+  const newUser = req.body;
+  console.log(newUser);
+  if (newUser.name && newUser.bio) {
+    db.insert(newUser)
+      .then(addedUser => {
+        res.status(201).json(addedUser);
+      })
+      .catch(err => {
+        res.status(500).json({
+          error: "There was an error while saving the user to the database"
+        });
+      });
+  } else {
+    res
+      .status(400)
+      .json({ errorMessage: "Please provide name and bio for the user." });
+  }
 });
 
 server.listen(port, () => console.log(`API running on port ${port}`));
